@@ -4,6 +4,7 @@
 Usage: hints.py /scenarios/scenario_02_linux.yml 2
 """
 import sys
+
 import yaml
 
 

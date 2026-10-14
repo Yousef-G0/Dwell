@@ -1,5 +1,15 @@
+---
 extends: default
 rules:
+  # The range deliberately uses compact flow-style lists/maps in Compose and
+  # scenario IOC data. Parse and indentation checks remain enabled; these
+  # cosmetic rules are disabled so CI accepts the established project style.
+  document-start: disable
   line-length: disable
+  comments-indentation: disable
+  braces: disable
+  brackets: disable
+  colons: disable
+  commas: disable
   truthy:
-    allowed-values: ['true', 'false', 'on', 'off']
+    allowed-values: ['true', 'false', 'on', 'off', 'yes', 'no']

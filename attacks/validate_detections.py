@@ -76,7 +76,8 @@ def main():
     for f in files:
         if f.endswith("scenario_template.yml"):
             continue
-        doc = yaml.safe_load(open(f))
+        with open(f, encoding="utf-8") as handle:
+            doc = yaml.safe_load(handle)
         req = doc.get("requires")
         sid, name = doc.get("id"), doc.get("name", "")
         if req and req not in TARGETS:

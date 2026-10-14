@@ -10,7 +10,6 @@ it produces identical output on Windows, Linux and macOS.
   python3 scripts/render_solutions.py out.md     # or a path you choose
 """
 import glob
-import io
 import os
 import sys
 
@@ -52,6 +51,6 @@ for path in sorted(glob.glob(os.path.join("scenarios", "scenario_*.yml"))):
     w("</details>\n")
 
 dest = sys.argv[1] if len(sys.argv) > 1 else "SOLUTIONS.md"
-with io.open(dest, "w", encoding="utf-8", newline="\n") as fh:
+with open(dest, "w", encoding="utf-8", newline="\n") as fh:
     fh.write("\n".join(out))
 print(f"Wrote {dest} ({len(out)} lines)")

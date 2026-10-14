@@ -19,12 +19,15 @@ won't be shifted. seed.sh waits before calling this to minimise that.
 Never fatal — a backdating failure must not fail the seed.
 """
 import json
+import logging
+import os
 import re
 import sys
 import time
 import urllib.error
 import urllib.request
-import os
+
+LOGGER = logging.getLogger(__name__)
 
 ES = os.environ.get("ES_HOST", "http://elasticsearch:9200")
 USER = os.environ.get("ES_USER", "elastic")
@@ -70,8 +73,8 @@ def ensure_noop_pipeline():
         es_req("PUT", f"_ingest/pipeline/{NOOP_PIPELINE}",
                {"description": "no-op: backdating must not re-run the parse pipeline",
                 "processors": []})
-    except Exception:                                          # noqa: BLE001
-        pass
+    except Exception:
+        LOGGER.warning("failed to ensure noop pipeline", exc_info=True)
 
 
 def main():
