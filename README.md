@@ -171,7 +171,7 @@ else; do not set it to `0.0.0.0`.
 <p align="center">
   <img src="docs/architecture.png" alt="DWELL architecture — topology and telemetry paths">
   <br>
-  <sub>Interactive diagram → <a href="https://yousef-g0.github.io/DWELL/architecture.html">open the live blueprint</a></sub>
+  <sub>Interactive diagram → <a href="https://yousef-g0.github.io/Dwell/architecture.html">open the live blueprint</a></sub>
 </p>
 
 | Layer | Components |
