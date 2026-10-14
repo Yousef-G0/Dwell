@@ -1,0 +1,25 @@
+name: Scenario proposal
+description: Propose a new safe, reproducible investigation.
+title: "[scenario]: "
+labels: ["good first scenario"]
+body:
+  - type: textarea
+    id: briefing
+    attributes:
+      label: Analyst briefing
+      description: Write it without answer-key spoilers.
+    validations:
+      required: true
+  - type: input
+    id: techniques
+    attributes:
+      label: ATT&CK techniques
+      placeholder: Txxxx, Tyyyy.zzz
+    validations:
+      required: true
+  - type: textarea
+    id: telemetry
+    attributes:
+      label: Telemetry and detection plan
+    validations:
+      required: true

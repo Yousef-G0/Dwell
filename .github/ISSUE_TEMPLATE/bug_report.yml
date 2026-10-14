@@ -1,0 +1,25 @@
+name: Broken scenario or detection
+description: Report a scenario that does not seed or a query that returns no data.
+title: "[bug]: "
+labels: [bug]
+body:
+  - type: input
+    id: scenario
+    attributes:
+      label: Scenario ID
+      placeholder: scenario_02_linux
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command and output
+      description: Include the command, host OS, and sanitized output.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected versus actual behavior
+    validations:
+      required: true

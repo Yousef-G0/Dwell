@@ -1,0 +1,12 @@
+# Copy to a private working directory; do not commit completed case files.
+scenario: scenario_02_linux
+iocs:
+  - type: ip
+    value: 172.30.0.99
+  - type: account
+    value: jdoe
+findings:
+  - id: initial_access
+    value: SSH brute force
+  - id: c2_protocol
+    value: HTTP

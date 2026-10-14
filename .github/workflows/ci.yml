@@ -1,0 +1,71 @@
+name: Validate range
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      run_integration:
+        description: Run the Docker range on a self-hosted 16+ GB runner
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Source and compose validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install linters
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff yamllint pyyaml
+          sudo apt-get update
+          sudo apt-get install --yes shellcheck
+      - name: Validate scenario schema
+        run: python scripts/validate_scenarios.py
+      - name: Lint YAML and Python
+        run: |
+          yamllint .
+          ruff check attacks scripts noise
+      - name: Lint shell scripts
+        run: shellcheck --severity=warning install.sh lab.sh attacks/seed.sh scripts/*.sh victim/linux/*.sh
+      - name: Render Compose configuration
+        run: |
+          cp .env.example .env
+          docker compose -f docker-compose.yml -f docker-compose.linux-victim.yml config --quiet
+
+  integration:
+    name: Seed and validate detections
+    needs: quality
+    if: github.event_name == 'workflow_dispatch' && inputs.run_integration
+    runs-on: [self-hosted, DWELL-integration]
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install, seed, and enforce answer-key queries
+        env:
+          LAB_AUTO: '1'
+          LAB_NO_PROGRESS: '1'
+        run: |
+          ./install.sh
+          set -a
+          . ./.env
+          set +a
+          docker compose -f docker-compose.yml -f docker-compose.linux-victim.yml exec -T \
+            -e ELASTIC_PASSWORD="$ELASTIC_PASSWORD" -e LAB_TARGETS=linux \
+            attacker python3 /attacks/validate_detections.py /scenarios
+      - name: Preserve service logs on failure
+        if: failure()
+        run: docker compose -f docker-compose.yml -f docker-compose.linux-victim.yml logs --no-color
+      - name: Tear down range
+        if: always()
+        run: docker compose -f docker-compose.yml -f docker-compose.linux-victim.yml down -v
