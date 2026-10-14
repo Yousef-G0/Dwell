@@ -57,7 +57,15 @@ pkg_install() {
 gen_secret() { openssl rand -hex 16 2>/dev/null || head -c 32 /dev/urandom | base64 | tr -dc 'a-zA-Z0-9' | head -c 24; }
 
 # Load .env if present
-load_env() { [[ -f "$ENV_FILE" ]] && set -a && source "$ENV_FILE" && set +a || true; }
+# shellcheck disable=SC1090
+load_env() {
+  if [[ -f "$ENV_FILE" ]]; then
+    set -a
+    # shellcheck source=/dev/null
+    source "$ENV_FILE"
+    set +a
+  fi
+}
 
 # Poll a URL until it returns HTTP 200 (or timeout). Args: url, timeout_s
 wait_http() {

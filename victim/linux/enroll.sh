@@ -20,7 +20,7 @@ AGENT_DIR=/opt/elastic-agent
 [ -z "$TOKEN" ] && { echo "[ERR ] no token"; exit 1; }
 [ -x "$AGENT_DIR/elastic-agent" ] || { echo "[ERR ] agent missing from image"; exit 1; }
 
-cd "$AGENT_DIR"
+cd "$AGENT_DIR" || exit 1
 pkill -x elastic-agent 2>/dev/null || true
 sleep 2
 
